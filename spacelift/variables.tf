@@ -27,16 +27,14 @@ variable "vcs" {
   })
   description = "VCS integration the stacks source their code from."
 
-  # CHANGE ME: namespace is the GitHub user or organisation that owns your fork,
-  # and id is the ID of your Spacelift VCS integration (Integrate services >
-  # GitHub). enterprise = true selects a named GitHub (custom app) integration by
-  # id. To use your account's default github.com integration instead, set
-  # enterprise = false and remove id.
+  # enterprise = false uses your Spacelift account's default GitHub integration,
+  # which is what you get when you sign up to Spacelift with GitHub. Nothing to
+  # change here. Only if you use a GitHub (custom app) integration instead, set
+  # enterprise = true and add namespace (your GitHub user or org) and id (the
+  # integration ID).
   default = {
     type       = "GITHUB"
-    enterprise = true
-    namespace  = "<YOUR_GITHUB_USER_OR_ORG>"
-    id         = "<YOUR_SPACELIFT_VCS_INTEGRATION_ID>"
+    enterprise = false
   }
 }
 

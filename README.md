@@ -6,6 +6,15 @@
 > [Configuration](#configuration), or list them with
 > `grep -rn "<YOUR_" --include=*.tf --include=*.yaml .`
 
+> [!WARNING]
+> Not for production. This is workshop sample code, and its defaults favour
+> getting started over least privilege: the ACK capability role has
+> `AdministratorAccess`, the kro and Argo CD capabilities are cluster admins, the
+> EKS API endpoint is public, and the 2048 app is served over plain HTTP on an
+> internet-facing ALB. Review and scope these down before using any of it in a
+> real environment, and destroy the stacks when you finish the workshop to avoid
+> ongoing charges.
+
 Infrastructure behind the EKS workshop - a VPC, an EKS Auto Mode cluster, and the
 ACK, kro and Argo CD capabilities running on top of it, plus the Argo CD bootstrap
 that points the cluster at the app repository.
@@ -35,7 +44,7 @@ waiting - about five minutes of typing and twenty of watching runs.
 
 ### What you need first
 
-- A Spacelift account with a VCS integration that can see your fork, and an AWS
+- A Spacelift account whose default GitHub integration can see your fork, and an AWS
   cloud integration whose role can create VPCs, EKS clusters, IAM roles and
   Identity Center groups.
 - IAM Identity Center enabled in that AWS account in `eu-west-1`, with a user for
@@ -45,7 +54,7 @@ waiting - about five minutes of typing and twenty of watching runs.
 
 ### 1. Fork it and fill in the placeholders
 
-Five values are placeholders of the form `<YOUR_...>` and must be replaced before
+Four values are placeholders of the form `<YOUR_...>` and must be replaced before
 anything will run. Find them with
 `grep -rn "<YOUR_" --include=*.tf --include=*.yaml .` and set them as described
 in [Configuration](#configuration).
@@ -182,7 +191,7 @@ created.
 
 ## Configuration
 
-Five values ship as `<YOUR_...>` placeholders and have to be replaced with your
+Four values ship as `<YOUR_...>` placeholders and have to be replaced with your
 own. Each is marked with a `CHANGE ME` comment, and you can list the placeholders
 with:
 
@@ -193,8 +202,6 @@ grep -rn "<YOUR_" --include=*.tf --include=*.yaml .
 | Placeholder | Variable | Where | What to put there |
 | --- | --- | --- | --- |
 | `<YOUR_SPACELIFT_AWS_INTEGRATION_ID>` | `aws_integration_id` | `spacelift/variables.tf` | ID of your Spacelift AWS integration (Integrate services > AWS) |
-| `<YOUR_GITHUB_USER_OR_ORG>` | `vcs.namespace` | `spacelift/variables.tf` | The GitHub user or org that owns your fork |
-| `<YOUR_SPACELIFT_VCS_INTEGRATION_ID>` | `vcs.id` | `spacelift/variables.tf` | ID of your Spacelift GitHub integration. With `enterprise = false`, remove it to use the default integration |
 | `<YOUR_AWS_ACCOUNT_ID>`, `<YOUR_IAM_ROLE_NAME>` | `cluster_admin_principal_arns` | `aws/eks/variables.tf` | The IAM role or user you run `kubectl` as. `aws sts get-caller-identity` shows it |
 | `<YOUR_IDC_USER_NAME>` | `argocd_admin_user_names` | `aws/eks/variables.tf` | An existing IAM Identity Center user name that gets Argo CD ADMIN |
 | `<YOUR_AWS_REGION>`, `<YOUR_AWS_ACCOUNT_ID>`, `<YOUR_CLUSTER_NAME>` | - | `kubernetes/cluster-local.yaml` | The cluster ARN |
@@ -207,13 +214,19 @@ before the cluster exists.
 
 When you're done, the `grep` above should return nothing.
 
+`vcs` in `spacelift/variables.tf` needs no change: with `enterprise = false` the
+stacks use your Spacelift account's default GitHub integration, which is what you
+get when you sign up to Spacelift with GitHub. Only if you use a GitHub (custom
+app) integration instead, set `enterprise = true` and add `namespace` (your GitHub
+user or org) and `id` (the integration ID).
+
 Edit the defaults directly, or leave them alone and override per stack in Spacelift
 with `TF_VAR_<name>`. If you go the environment variable route, the list and object
 values need to parse as HCL - brackets and braces included:
 
 ```bash
 TF_VAR_cluster_admin_principal_arns='["arn:aws:iam::<YOUR_AWS_ACCOUNT_ID>:role/<YOUR_IAM_ROLE_NAME>"]'
-TF_VAR_vcs='{type="GITHUB",enterprise=true,namespace="<YOUR_GITHUB_USER_OR_ORG>",id="<YOUR_SPACELIFT_VCS_INTEGRATION_ID>"}'
+TF_VAR_argocd_admin_user_names='["<YOUR_IDC_USER_NAME>"]'
 ```
 
 Everything else - region, cluster name, CIDR, Kubernetes and kubectl versions -
