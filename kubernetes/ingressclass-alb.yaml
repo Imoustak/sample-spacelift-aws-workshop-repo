@@ -1,0 +1,29 @@
+# Auto Mode's built-in ALB controller does not watch for IngressClass objects
+# automatically — you must create one that points at eks.amazonaws.com/alb.
+#
+# IngressClassParams is required for the scheme because Auto Mode explicitly
+# does not honour the scheme annotation on the IngressClass itself; configuration
+# must go through IngressClassParams (AWS docs: "You cannot use Annotations on
+# an IngressClass... IngressClass configuration should be done through
+# IngressClassParams").
+#
+# internet-facing: the 2048 game is a public endpoint served through an ALB.
+apiVersion: eks.amazonaws.com/v1
+kind: IngressClassParams
+metadata:
+  name: alb
+spec:
+  scheme: internet-facing
+---
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: alb
+  annotations:
+    ingressclass.kubernetes.io/is-default-class: "true"
+spec:
+  controller: eks.amazonaws.com/alb
+  parameters:
+    apiGroup: eks.amazonaws.com
+    kind: IngressClassParams
+    name: alb
