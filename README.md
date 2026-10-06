@@ -1,5 +1,12 @@
 # Spacelift on AWS workshop
 
+> [!NOTE]
+> This repository is based on the original
+> [workshop](https://github.com/eminalemdar/workshop) repository by
+> [@eminalemdar](https://github.com/eminalemdar). Full credit to the original
+> author for the source material. The upstream project is licensed under
+> Apache-2.0.
+
 > [!IMPORTANT]
 > This repository ships with placeholders, not working values. Before the stacks
 > can run you must replace every `<YOUR_...>` value - see
@@ -429,4 +436,4 @@ See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more inform
 
 ## License
 
-This library is licensed under the MIT-0 License. See the LICENSE file.
+This library is licensed under the Apache-2.0 License. See the LICENSE file.
